@@ -9,10 +9,12 @@ LVM2 for provisioning storage devices
 All should be installed except Podman:
 
 ```yaml
-sudo apt update```
+sudo apt update
+```
 
 ```yaml
-sudo apt install podman```
+sudo apt install podman
+```
 
 Deploy Admin Node
 
@@ -25,16 +27,19 @@ Deploy Admin Node
 
 Installing Cephadm (on admin node)
 
-3.  ```apt install -y cephadm```
+3.  ```yaml
+apt install -y cephadm
+```
 
     if not able to use that:
     CEPH_RELEASE=replace this with the active release (https://docs.ceph.com/en/latest/releases/#active-releases)
 
-    ```curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```
+    ```yaml
+    curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```
 
 4.  Check that the file is executable and can be run from current directory
 
-    ```chmod +x cephadm```
+    ```yaml chmod +x cephadm```
 
 5.  Install the Cephadm command 
 
