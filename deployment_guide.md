@@ -24,8 +24,6 @@ Deploy Admin Node
 
 2.	Connect switch to Admin Node, configure that node with Public Network IP and storage network IP (2 networks)
     a. if connecting to management network, this object will need 3 NICs
-    
-    Reason: all Ceph actions run through admin node, will appear as traffic on public network between admin/controller while the data is accessed on the private storage network between nodes
 
 Installing Cephadm (on admin node)
 
