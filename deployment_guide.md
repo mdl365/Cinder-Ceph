@@ -1,9 +1,13 @@
 Requirements to be a Node: 
 
 Python 3
+
 Systemd
+
 Podman or Docker for running containers
+
 Time synchronization (such as Chrony or the legacy ntpd)
+
 LVM2 for provisioning storage devices
 
 All should be installed except Podman:
@@ -32,23 +36,33 @@ apt install -y cephadm
 ```
 
     if not able to use that:
+    ```yaml
     CEPH_RELEASE=replace this with the active release (https://docs.ceph.com/en/latest/releases/#active-releases)
+    ```
 
     ```yaml
-    curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```
+    curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm
+    ```
 
 4.  Check that the file is executable and can be run from current directory
 
-    ```yaml chmod +x cephadm```
+    ```yaml chmod +x cephadm
+    ```
 
 5.  Install the Cephadm command 
 
-```./cephadm add-repo --release reef```
-```./cephadm install```
+```yaml
+./cephadm add-repo --release reef
+```
+```yaml
+./cephadm install
+```
 
 6.  Confirm Install with 
 
-```which cephadm```
+```yaml
+which cephadm
+```
 
 should output "/usr/sbin/cephadm"
 
@@ -57,7 +71,9 @@ Boostrap a New Cluster
 *this command creates an MON/MGR on admin node*
 *Note: mon-ip= public IP
 
-7.  ```cephadm bootstrap --mon-ip <mon-ip> --cluster-network <private(storage) address>```
+7.  ```yaml
+cephadm bootstrap --mon-ip <mon-ip> --cluster-network <private(storage) address>
+```
 
 At this point: Cephadm takes over alot
     a. Creates monitor and manager daemon on node
@@ -66,8 +82,13 @@ At this point: Cephadm takes over alot
 
 *Optional: Install Ceph Containers*
 
-```cephadm add-repo --release quincy```
-```cephadm install ceph-common```
+```yaml
+cephadm add-repo --release quincy
+```
+
+```yaml
+cephadm install ceph-common
+```
 
 8.  Confirm Install with: 
 
