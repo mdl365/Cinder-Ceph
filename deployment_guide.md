@@ -1,0 +1,117 @@
+Requirements to be a Node: 
+
+Python 3
+Systemd
+Podman or Docker for running containers
+Time synchronization (such as Chrony or the legacy ntpd)
+LVM2 for provisioning storage devices
+
+All should be installed except Podman:
+
+```sudo apt update```
+```sudo apt install podman```
+
+Deploy Admin Node
+
+1.	Connect compute/controller node to switch (optionally a VyOS object) 
+
+2.	Connect switch to Admin Node, configure that node with Public Network IP and storage network IP (2 networks)
+    a. if connecting to management network, this object will need 3 NICs
+    
+    Reason: all Ceph actions run through admin node, will appear as traffic on public network between admin/controller while the data is accessed on the private storage network between nodes
+
+Installing Cephadm (on admin node)
+
+3.  ```apt install -y cephadm```
+
+    if not able to use that:
+    CEPH_RELEASE=replace this with the active release (https://docs.ceph.com/en/latest/releases/#active-releases)
+
+    ```curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```
+
+4.  Check that the file is executable and can be run from current directory
+
+    ```chmod +x cephadm```
+
+5.  Install the Cephadm command 
+
+./cephadm add-repo --release reef
+./cephadm install
+
+6.  Confirm Install with 
+
+```which cephadm```
+
+should output "/usr/sbin/cephadm"
+
+Boostrap a New Cluster
+
+*this command creates an MON/MGR on admin node*
+*Note: mon-ip= public IP
+
+7.  ```cephadm bootstrap --mon-ip <mon-ip> --cluster-network <private(storage) address>```
+
+At this point: Cephadm takes over alot
+    a. Creates monitor and manager daemon on node
+    b. Adds SSH key for Ceph cluster to root user's file
+    c. CONTINUE EXPLAINATION
+
+*Optional: Install Ceph Containers*
+
+```cephadm add-repo --release quincy```
+```cephadm install ceph-common```
+
+8.  Confirm Install with: 
+
+```ceph -v```
+
+9.  Check Cluster Connection and Status
+
+```ceph status```
+
+Deploy Additional Nodes
+
+*We deployed monitor and manager on the admin node, all remaining nodes will need MON and OSD*
+
+10. Run these commands on Admin node for all hosts we want to add: 
+
+```ssh-copy-id -f -i /etc/ceph/ceph.pub root@*<new-host-ip>*```
+
+11. Create a Hosts.yaml file in the current directory
+
+Example Structure:
+
+service_type: host
+hostname: node-00
+addr: 192.168.0.10
+labels:
+- example1
+- example2
+---
+service_type: host
+hostname: node-01
+addr: 192.168.0.11
+labels:
+- grafana
+--- 
+
+12. Run the YAML file
+
+```ceph orch apply -i hosts.yaml```
+
+13. Deploy 2 more MON nodes
+
+```ceph orch daemon add mon hostnames_from_YAML```
+
+14. Tell Ceph to consume all unused device
+
+```ceph orch apply osd --all-available-devices```
+
+
+https://docs.ceph.com/en/latest/rbd/rbd-openstack/
+
+
+
+
+
+
