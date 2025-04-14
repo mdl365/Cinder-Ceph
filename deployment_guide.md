@@ -35,8 +35,8 @@ Installing Cephadm (on admin node)
 
 5.  Install the Cephadm command 
 
-./cephadm add-repo --release reef
-./cephadm install
+```./cephadm add-repo --release reef```
+```./cephadm install```
 
 6.  Confirm Install with 
 
@@ -81,7 +81,7 @@ Deploy Additional Nodes
 
 Example Structure:
 
-service_type: host
+```service_type: host
 hostname: node-00
 addr: 192.168.0.10
 labels:
@@ -93,7 +93,8 @@ hostname: node-01
 addr: 192.168.0.11
 labels:
 - grafana
---- 
+---
+```yaml
 
 12. Run the YAML file
 
