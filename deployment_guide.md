@@ -67,7 +67,7 @@ should output "/usr/sbin/cephadm"
 Boostrap a New Cluster
 
 *this command creates an MON/MGR on admin node*
-*Note: mon-ip= public IP
+*Note: mon-ip= public (client) IP
 
 7.  
 ```yaml
