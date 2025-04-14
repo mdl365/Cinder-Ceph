@@ -8,8 +8,8 @@ LVM2 for provisioning storage devices
 
 All should be installed except Podman:
 
-```sudo apt update```
-```sudo apt install podman```
+```sudo apt update```yaml
+```sudo apt install podman```yaml
 
 Deploy Admin Node
 
@@ -22,25 +22,25 @@ Deploy Admin Node
 
 Installing Cephadm (on admin node)
 
-3.  ```apt install -y cephadm```
+3.  ```apt install -y cephadm```yaml
 
     if not able to use that:
     CEPH_RELEASE=replace this with the active release (https://docs.ceph.com/en/latest/releases/#active-releases)
 
-    ```curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```
+    ```curl --silent --remote-name --location https://download.ceph.com/rpm-$<CEPH_RELEASE>/el9/noarch/cephadm```yaml
 
 4.  Check that the file is executable and can be run from current directory
 
-    ```chmod +x cephadm```
+    ```chmod +x cephadm```yaml
 
 5.  Install the Cephadm command 
 
-```./cephadm add-repo --release reef```
-```./cephadm install```
+```./cephadm add-repo --release reef```yaml
+```./cephadm install```yaml
 
 6.  Confirm Install with 
 
-```which cephadm```
+```which cephadm```yaml
 
 should output "/usr/sbin/cephadm"
 
@@ -49,7 +49,7 @@ Boostrap a New Cluster
 *this command creates an MON/MGR on admin node*
 *Note: mon-ip= public IP
 
-7.  ```cephadm bootstrap --mon-ip <mon-ip> --cluster-network <private(storage) address>```
+7.  ```cephadm bootstrap --mon-ip <mon-ip> --cluster-network <private(storage) address>```yaml
 
 At this point: Cephadm takes over alot
     a. Creates monitor and manager daemon on node
@@ -58,16 +58,16 @@ At this point: Cephadm takes over alot
 
 *Optional: Install Ceph Containers*
 
-```cephadm add-repo --release quincy```
-```cephadm install ceph-common```
+```cephadm add-repo --release quincy```yaml
+```cephadm install ceph-common```yaml
 
 8.  Confirm Install with: 
 
-```ceph -v```
+```ceph -v```yaml
 
 9.  Check Cluster Connection and Status
 
-```ceph status```
+```ceph status```yaml
 
 Deploy Additional Nodes
 
@@ -75,7 +75,7 @@ Deploy Additional Nodes
 
 10. Run these commands on Admin node for all hosts we want to add: 
 
-```ssh-copy-id -f -i /etc/ceph/ceph.pub root@*<new-host-ip>*```
+```ssh-copy-id -f -i /etc/ceph/ceph.pub root@*<new-host-ip>*```yaml
 
 11. Create a Hosts.yaml file in the current directory
 
@@ -98,15 +98,15 @@ labels:
 
 12. Run the YAML file
 
-```ceph orch apply -i hosts.yaml```
+```ceph orch apply -i hosts.yaml```yaml
 
 13. Deploy 2 more MON nodes
 
-```ceph orch daemon add mon hostnames_from_YAML```
+```ceph orch daemon add mon hostnames_from_YAML```yaml
 
 14. Tell Ceph to consume all unused device
 
-```ceph orch apply osd --all-available-devices```
+```ceph orch apply osd --all-available-devices```yaml
 
 
 https://docs.ceph.com/en/latest/rbd/rbd-openstack/
