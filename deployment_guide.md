@@ -12,9 +12,7 @@ LVM2 for provisioning storage devices
 
 All should be installed except Podman:
 
-```yaml
-sudo apt update
-```
+All devices need an address in Public and Storage Network
 
 ```yaml
 sudo apt install podman
