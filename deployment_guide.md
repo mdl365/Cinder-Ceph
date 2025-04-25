@@ -68,10 +68,11 @@ which cephadm
 should output "/usr/sbin/cephadm"
 
 
-Boostrap a New Cluster
+Bootstrap a New Cluster
 
 *this command creates an MON/MGR/dashboard on admin node*
 *Note: mon-ip= public IP
+
 --cluster-network option used if deploying seperate storage network
     --cluster-network <private(storage) address>*
 
@@ -82,9 +83,13 @@ CEPHADM_IMAGE=quay.io/ceph/ceph:v18.2.2 cephadm bootstrap --mon-ip 192.168.122.x
 *IMPORTANT*: If configuring dashboard, note default username and password are given during bootstrap, keep these for later
 
 At this point: Cephadm takes over alot
+
     a. Creates monitor and manager daemon on node
+
     b. Adds SSH key for Ceph cluster to root user's file
+
     c. CONTINUE EXPLAINATION
+    
 
 *Optional: Install Ceph Containers*
 
