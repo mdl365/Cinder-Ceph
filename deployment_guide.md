@@ -79,7 +79,8 @@ Boostrap a New Cluster
 ```yaml
 CEPHADM_IMAGE=quay.io/ceph/ceph:v18.2.2 cephadm bootstrap --mon-ip 192.168.122.xxx 
 ```
-*IMPORTANT* If configuring dashboard, note default username and password are given during bootstrap, keep these for later
+*IMPORTANT*: If configuring dashboard, note default username and password are given during bootstrap, keep these for later
+
 At this point: Cephadm takes over alot
     a. Creates monitor and manager daemon on node
     b. Adds SSH key for Ceph cluster to root user's file
