@@ -1,4 +1,4 @@
-Requirements to be a Node: 
+**Requirements to be a Node: **
 
 Python 3
 
