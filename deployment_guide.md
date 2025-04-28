@@ -236,7 +236,7 @@ ceph -s
 # Task 7: Integrate Cinder and Ceph
 
 # Task 8: Deploy an OpenStack object with Ceph backend storage
-From here, you will need to integrate Ceph and Cinder, deploy an openstack server, and mount storage from Ceph/Cinder
+
 
 
 
