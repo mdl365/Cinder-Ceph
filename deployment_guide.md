@@ -8,7 +8,7 @@
 
 All should be pre-installed except Podman:
 
-### **MAKE SURE PODMAN IS INSTALLED, PREFERRED BY CEPH**
+### **Docker will work but Podman is preferred by Ceph**
 
 ```yaml
 sudo apt install podman
