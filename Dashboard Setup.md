@@ -3,7 +3,7 @@ Since we didn't have a GUI object available for Dashboard, I reverse SSH tunnele
 ssh -R 8443:<deviceruningdashboardIP:8443> itsvm@<gHost IP>
 ```
 
-Needs to staying running, I didn't put it in the background. 
+Needs to staying running, can be ran in the background if desired 
 
 on gHost, go to http://deviceruningdashboardIP:8443
     a.) use the login credentials from bootstrap
