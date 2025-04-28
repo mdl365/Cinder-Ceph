@@ -194,7 +194,7 @@ ssh-copy-id -f -i /etc/ceph/ceph.pub root@<target OSD IP>
 sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
 sudo systemctl restart ssh
 ```
-*This is just for security, only allows key-based authentication to root user after initial*
+*This is just for security, only allows key-based authentication to root user after initial SSH setup*
 
 21.  **Back to Ceph-Admin,** run the following to add host:
 
