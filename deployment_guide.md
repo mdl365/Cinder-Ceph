@@ -1,10 +1,10 @@
 ### **Requirements to be a Ceph Node:**
 
-    -Python 3
+-Python 3
 
-    -Podman or Docker for running containers
+-Podman or Docker for running containers
 
-    -LVM2 for provisioning storage devices
+-LVM2 for provisioning storage devices
 
 All should be pre-installed except Podman:
 
