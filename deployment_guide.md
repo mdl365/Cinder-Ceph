@@ -1,33 +1,32 @@
-**Requirements to be a Node: **
+### **Requirements to be a Node:**
 
-Python 3
+    -Python 3
 
-Systemd
+    -Podman or Docker for running containers
 
-Podman or Docker for running containers
+    -LVM2 for provisioning storage devices
 
-Time synchronization (such as Chrony or the legacy ntpd)
+All should be pre-installed except Podman:
 
-LVM2 for provisioning storage devices
-
-All devices need an address in Public and Storage Network
-
-All should be installed except Podman:
-
-MAKE SURE PODMAN IS INSTALLED, PREFERRED BY CEPH
+### **MAKE SURE PODMAN IS INSTALLED, PREFERRED BY CEPH**
 
 ```yaml
 sudo apt install podman
 ```
+# **Task 0: Ensure Deployment from Lab 5 is functional**
 
-Deploy Ceph-Admin Node
+https://github.com/OHIO-ECT/ITS-4900-SDx-HW-05
 
-1.	Connect compute/controller node to switch (optionally a VyOS object) 
+These instructions below build on an Openstack environment with a working Controller and Compute node, that can deploy VMs
 
-2.	Connect switch to Admin Node, configure that node with Public Network IP and storage network IP (2 networks)
-    a. if connecting to management network, this object will need 3 NICs
+# **Task 1: Deploy Ceph-Admin Node**
 
-Installing Cephadm (on admin node)
+1.  Add a new Ubuntu-22-CLI object in GNS3
+
+2.	Connect switch to Admin Node, configure that node with Management Network IP
+	    Optional: If using a storage network for Ceph, also make sure the admin node has an IP in that subnet 
+
+### Installing Cephadm (on admin node)
 
 3. 
 ```yaml
