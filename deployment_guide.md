@@ -26,7 +26,7 @@ sudo apt install podman
 
 https://github.com/OHIO-ECT/ITS-4900-SDx-HW-05
 
-These instructions below build on an Openstack environment with a working Controller and Compute node, that can deploy VMs
+The instructions in this lab build on an already built Openstack environment with a working Controller and Compute node that is able to deploy VMs
 
 # **Task 1: Deploy Ceph-Admin Node and Bootstrap**
 
