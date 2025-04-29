@@ -36,6 +36,28 @@ Dashboard Screenshots
   <img src="Picture4.png" width="600" alt="4."/>
 </a>
 
+
+<a href="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture1%281%29.png" target="_blank">
+  <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture1%281%29.png" width="600" alt="1."/>
+</a>
+
+<a href="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture2.png" target="_blank">
+  <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture2.png" width="600" alt="2."/>
+</a>
+
+<a href="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture3.png" target="_blank">
+  <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture3.png" width="600" alt="3."/>
+</a>
+
+<a href="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture4.png" target="_blank">
+  <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture4.png" width="600" alt="4."/>
+</a>
+
+<a href="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture6.png" target="_blank">
+  <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture6.png" width="600" alt="5."/>
+</a>
+
+
 <a href="Picture6.png" target="_blank">
   <img src="Picture6.png" width="600" alt="5."/>
 </a>
