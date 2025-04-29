@@ -11,3 +11,11 @@ Needs to staying running, can be ran in the background if desired
 On gHost, go to http://<deviceruningdashboardIP>:8443
     a.) use the login credentials from bootstrap
     b.) will be prompted to change password after first login
+
+Dashboard Screenshots
+
+![1.](Picture1(1).png) 
+![2.](Picture2.png) 
+![2.](Picture3.png) 
+![2.](Picture4.png) 
+![2.](Picture6.png) 
