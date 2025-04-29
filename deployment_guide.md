@@ -102,7 +102,7 @@ sudo apt install cinder-api cinder-scheduler
 ```yaml
 sudo nano /etc/cinder/cinder.conf
 ```
-Configure database access as shown, replace CINDER_DBPASS, RABBIT_PASS, and CINDER_PASS with correct password set in the steps above:
+Configure database access by adding/changing the sections as shown, replace CINDER_DBPASS, RABBIT_PASS, and CINDER_PASS with correct password set in the steps above:
 ```yaml
 [database]
 connection = mysql+pymysql://cinder:CINDER_DBPASS@controller/cinder
