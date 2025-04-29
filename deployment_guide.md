@@ -90,10 +90,12 @@ openstack endpoint create --region RegionOne \
 
 exit
 ```
-Make sure to exit database after above command
+#### Make sure to exit database after above command
 
 **Install Required Packages**
+```yaml
 sudo apt install cinder-api cinder-scheduler
+```
 
 **Edit Cinder.conf**
 ```yaml
@@ -154,6 +156,20 @@ https://docs.ceph.com/en/reef/cephadm/install/#cephadm-deploying-new-cluster
 1.  Add a new Ubuntu-22-CLI object in GNS3, this will be our admin node
 
 2.  Connect switch to Admin Node, configure that node with Management Network IP
+
+Configure:
+```yaml
+sudo nmcli general hostname ceph-admin 
+sudo nmcli con mod "Wired connection 1" ipv4.addresses 192.168.122.120/24
+sudo nmcli con mod "Wired connection 1" ipv4.gateway 192.168.122.1
+sudo nmcli con mod "Wired connection 1" ipv4.dns 192.168.122.1
+sudo nmcli con mod "Wired connection 1" ipv4.method manual
+sudo nmcli con mod "Wired connection 1" ipv6.method disabled
+sudo nmcli con mod "Wired connection 2" ipv4.method disabled
+sudo nmcli con mod "Wired connection 2" ipv6.method disabled
+sudo ncmli con down "Wired connection 1"
+sudo nmcli con up "Wired connection 1"
+```
 
 *Optional: If using a storage network for Ceph, also make sure the admin node has an IP in that subnet*
 
@@ -277,6 +293,20 @@ Ceph recommends a minimum of 3 object storage devices (OSDs). Deploy 3 additiona
 ```yaml
 sudo fdisk -l
 ```
+*Configure Host with this template, increment for each node added*
+```yaml
+sudo nmcli general hostname ceph-1
+sudo nmcli con mod "Wired connection 1" ipv4.addresses 192.168.122.121/24
+sudo nmcli con mod "Wired connection 1" ipv4.gateway 192.168.122.1
+sudo nmcli con mod "Wired connection 1" ipv4.dns 192.168.122.1
+sudo nmcli con mod "Wired connection 1" ipv4.method manual
+sudo nmcli con mod "Wired connection 1" ipv6.method disabled
+sudo nmcli con mod "Wired connection 2" ipv4.method disabled
+sudo nmcli con mod "Wired connection 2" ipv6.method disabled
+sudo ncmli con down "Wired connection 1"
+sudo nmcli con up "Wired connection 1"
+
+
 15.  If you used HDB like me, follow these commands: If not, replace *dev/vdb* with the name of the disk you used
 ```yaml
 sudo wipefs --af /dev/vdb
@@ -555,6 +585,46 @@ b. Choose the image associated to the copy-on-write clone.
 c. Select ‘boot from volume’.
 
 d. Select the volume you created.
+
+41. Confirm with
+``` yaml
+openstack volume list
+```
+**Should show your volume as in-use **
+```yaml
+root@controller:/home/itsclass# openstack volume list
++--------------------+---------------+--------+------+--------------------+
+| ID                 | Name          | Status | Size | Attached to        |
++--------------------+---------------+--------+------+--------------------+
+| fbe00355-47fa-     | Test-3        | in-use |    1 | Attached to        |
+| 41e4-bff6-         |               |        |      | provider-instance  |
+| 40a2b4158feb       |               |        |      | on /dev/vda        |
+| 7fee7136-1bfd-     | test-volume-2 | in-use |    1 | Attached to        |
+| 481a-adb7-         |               |        |      | provider-instance  |
+| 745d9b12da42       |               |        |      | on /dev/vdb        |
+```
+
+42. You can also boot from a Glance image and then attach storage with
+```yaml
+openstack server add volume <server-name-or-id> <volume-name-or-id>
+```
+
+Example of a machine booted from Glance Image and One that was given the image to boot from volume
+```yaml
+root@controller:/home/itsclass# openstack server list
++--------------+--------------+--------+--------------+--------------+---------+
+| ID           | Name         | Status | Networks     | Image        | Flavor  |
++--------------+--------------+--------+--------------+--------------+---------+
+| 92117284-    | provider-    | ACTIVE | provider=100 | N/A (booted  | m1.nano |
+| da2b-49b2-   | instance     |        | .70.140.15   | from volume) |         |
+| 8a9c-        |              |        |              |              |         |
+| fb95ea00d9ed |              |        |              |              |         |
+| fd24180c-    | provider-    | ACTIVE | provider=100 | cirros       | m1.nano |
+| ce40-482a-   | instance     |        | .70.140.75   |              |         |
+| a01f-        |              |        |              |              |         |
+| 7f365b036efe |              |        |              |              |         |
++--------------+--------------+--------+--------------+--------------+---------+
+```
 
 
 ### Optional Final Step
