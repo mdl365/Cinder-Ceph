@@ -47,6 +47,6 @@ Bootstrap complete.
 ```
 
 ### Dashboard Access:
-[See] (Dashboard Setup.md)
+See [Dashboard Setup](Dashboard%20Setup.md)
 
 
