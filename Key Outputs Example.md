@@ -1,160 +1,52 @@
-# Reordered Documentation: Sample Outputs from Key Deployment Stages
-
-## 📃 Node Summary
-
-| Node       | IP Address      | Hostname   | Roles/Services                                                     |
-| ---------- | --------------- | ---------- | ------------------------------------------------------------------ |
-| Controller | 192.168.122.100 | controller | Keystone, Glance, Nova API, Neutron, Cinder API/Scheduler, Horizon |
-| Compute    | 192.168.122.101 | compute    | Nova Compute, Ceph-integrated                                      |
-| Ceph-Admin | 192.168.122.120 | ceph1-mgr  | MON, MGR, Dashboard, Ceph bootstrap/admin                          |
-| Ceph-OSD1  | 192.168.122.121 | ceph-osd1  | Ceph OSD Daemon (OSD.0)                                            |
-| Ceph-OSD2  | 192.168.122.122 | ceph-osd2  | Ceph OSD Daemon (OSD.1)                                            |
-| Ceph-OSD3  | 192.168.122.123 | ceph-osd3  | Ceph OSD Daemon (OSD.2)                                            |
-
-## 🛠️ Ceph Setup and Cluster Preparation
-
-### Hostnames and Static IP Assignment:
-Performed on Ceph nodes using `nmcli`.
+# Sample Outputs from Key Deployment Stages
 
 ### Bootstrap Ceph Cluster:
-```bash
-sudo cephadm bootstrap --mon-ip 192.168.122.201   --initial-dashboard-user admin   --initial-dashboard-password <redacted>
-```
+Command:
+CEPHADM_IMAGE=quay.io/ceph/ceph:v18.2.2 cephadm bootstrap --mon-ip 192.168.122.120
+
+**Output: Should say "Bootstrap complete", make sure to note admin password for dashboard**
+
+Verifying podman|docker is present...
+Verifying lvm2 is present...
+Verifying time synchronization is in place...
+Unit systemd-timesyncd.service is enabled and running
+Repeating the final host check...
+docker (/usr/bin/docker) is present
+systemctl is present
+lvcreate is present
+Unit systemd-timesyncd.service is enabled and running
+Host looks OK
+Cluster fsid: 35401aee-1c91-11f0-8a86-f9710bb7f276
+Verifying IP 192.168.122.120 port 3300 ...
+Verifying IP 192.168.122.120 port 6789 ...
+Mon IP `192.168.122.120` is in CIDR network `192.168.122.0/24`
+Mon IP `192.168.122.120` is in CIDR network `192.168.122.0/24`
+Internal network (--cluster-network) has not been provided, OSD replication will default to the public_network
+Pulling container image quay.io/ceph/ceph:v18.2.2...
+Ceph version: ceph version 18.2.2 (531c0d11a1c5d39fbfe6aa8a521f023abf3bf3e2) reef (stable)
+...
+Deploying ceph-exporter service with default placement...
+Deploying prometheus service with default placement...
+Deploying grafana service with default placement...
+Deploying node-exporter service with default placement...
+Deploying alertmanager service with default placement...
+Enabling the dashboard module...
+Waiting for the mgr to restart...
+Waiting for mgr epoch 9...
+mgr epoch 9 is available
+Generating a dashboard self-signed certificate...
+Creating initial admin user...
+Fetching dashboard port number...
+Ceph Dashboard is now available at:
+
+             URL: https://ip6-localhost:8443/
+            User: admin
+        Password: xfdnej4utp
+...
+Bootstrap complete.
+
 
 ### Dashboard Access:
-```
-https://192.168.122.201:8443/
-```
+[See] (Dashboard Setup.md)
 
-### Add Ceph Hosts to Cluster:
-```bash
-ceph orch host add ceph-osd1 192.168.122.202
-ceph orch host add ceph-osd2 192.168.122.203
-ceph orch host add ceph-osd3 192.168.122.204
-```
 
-### Verify Available Disks:
-```bash
-ceph orch device ls ceph-osd3
-```
-
-### Create OSDs and Volumes Pool:
-```bash
-ceph orch daemon add osd ceph-osd3:/dev/vdb
-ceph osd pool create volumes 64
-```
-
-## 📁 Cinder Integration with Ceph (Controller Node)
-
-### Install and Enable Cinder Services:
-```bash
-sudo apt install cinder-api cinder-scheduler cinder-volume ceph-common -y
-sudo systemctl enable --now cinder-volume
-```
-
-### Register Cinder with Keystone:
-```bash
-openstack user create --domain default --password-prompt cinder
-openstack role add --project service --user cinder admin
-openstack service create --name cinderv3 --description "OpenStack Block Storage" volumev3
-openstack endpoint create --region RegionOne volumev3 public http://controller:8776/v3/%\(project_id\)s
-```
-
-### Configure `/etc/cinder/cinder.conf`:
-```ini
-[DEFAULT]
-auth_strategy = keystone
-enabled_backends = ceph
-glance_api_version = 2
-transport_url = rabbit://openstack:<password>@controller
-
-[keystone_authtoken]
-auth_url = http://controller:5000
-www_authenticate_uri = http://controller:5000
-memcached_servers = controller:11211
-auth_type = password
-project_domain_name = default
-user_domain_name = default
-project_name = service
-username = cinder
-password = <password>
-
-[ceph]
-volume_driver = cinder.volume.drivers.rbd.RBDDriver
-rbd_pool = volumes
-rbd_ceph_conf = /etc/ceph/ceph.conf
-rbd_user = cinder
-rbd_secret_uuid = <generated-uuid>
-volume_backend_name = cep
-```
-
-## 🏠 Compute Node Configuration (Nova + Ceph)
-
-### Install Ceph Utilities:
-```bash
-sudo apt install ceph-common -y
-```
-
-### Copy Ceph Config and Keyring:
-```bash
-scp ceph.conf ceph.client.cinder.keyring /etc/ceph/
-chown root: /etc/ceph/ceph.*
-chmod 644 /etc/ceph/ceph.*
-```
-
-### Update `/etc/nova/nova.conf`:
-```ini
-[DEFAULT]
-my_ip = 192.168.122.111
-transport_url = rabbit://openstack:<password>@controller
-
-[libvirt]
-images_type = rbd
-images_rbd_pool = volumes
-images_rbd_ceph_conf = /etc/ceph/ceph.conf
-rbd_user = cinder
-rbd_secret_uuid = <same-uuid-as-cinder>
-disk_cachemodes="network=writeback"
-inject_password = false
-inject_key = false
-inject_partition = -2
-```
-
-## 🔒 Libvirt Secret Configuration
-
-On each compute node:
-```bash
-uuidgen  # Save the UUID
-cat > secret.xml <<EOF
-<secret ephemeral='no' private='no'>
-  <uuid><insert-uuid></uuid>
-  <usage type='ceph'>
-    <name>client.cinder secret</name>
-  </usage>
-</secret>
-EOF
-
-sudo virsh secret-define --file secret.xml
-sudo virsh secret-set-value --secret <uuid> --base64 $(cat client.cinder.key) && rm client.cinder.key secret.xml
-```
-
-## 📄 Volume Creation and Verification
-
-### Create Volume from Glance Image:
-```bash
-openstack volume create --image cirros --size 1 boot-from-volume-cirros
-```
-
-### List Volumes:
-```bash
-openstack volume list
-```
-
-### Sample Output:
-```text
-| ID                                   | Name                  | Status    | Size | Attached to |
-|--------------------------------------|------------------------|-----------|------|--------------|
-| 5bc94aaa-874a-46a3-9201-abf9632f55e1 | boot-from-volume-cirros | available | 1    |              |
-```
-
-This reordering retains all the original content but structures it around logical deployment milestones.
