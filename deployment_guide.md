@@ -1,6 +1,9 @@
 # Lab Overview
 
 ![Final Product](Picture1.png)
+
+In the diagram you see, there is an extra switch from an attempt to deploy an additional storage network for Ceph. One switch will suffice if only adding Ceph to management network. 
+
 [![3](Dash-3.png)
 
 |Node	    |IP Address        |  Hostname|	Roles/Services|
@@ -11,9 +14,6 @@
 |Ceph-OSD1  |  192.168.122.121 | ceph-1      |	Ceph OSD daemon (OSD.0)
 |Ceph-OSD2  |  192.168.122.122 | ceph-2      |	Ceph OSD daemon (OSD.1)
 |Ceph-OSD3  |  192.168.122.123 | ceph-3      |	Ceph OSD daemon (OSD.2)
-
-
-In the diagram you see, there is an extra switch from an attempt to deploy an additional storage network for Ceph. One switch will suffice if only adding Ceph to management network. 
 
 Ceph is a scalable, distributed storage system that provides unified access to block, object, and file storage. In our project, we deployed Ceph specifically as a block storage backend for OpenStack Cinder, using RBD (RADOS Block Device) to deliver networked block storage to virtual machines. RBD allows Ceph to present block devices over the network, with built-in replication and fault tolerance. While we only configured block storage for this deployment, Ceph is capable of supporting object storage (via RADOS Gateway) and file storage (via CephFS) if needed in the future.
 
