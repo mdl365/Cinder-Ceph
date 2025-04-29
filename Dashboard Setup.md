@@ -5,12 +5,12 @@
 Run this command on the Ceph-Admin host
 
 ```yaml
-ssh -R 8443:<deviceruningdashboardIP:8443> itsvm@<gHost IP>
+ssh -R 8443:{deviceruningdashboardIP}:8443 itsvm@<gHost IP>
 ```
 
 ***Needs to staying running, can be ran in the background if desired*** 
 
-On gHost, go to http://< deviceruningdashboardIP >:8443
+On gHost browser, go to **http://{deviceruningdashboardIP}:8443**
     a.) use the login credentials from bootstrap
     b.) will be prompted to change password after first login
 
