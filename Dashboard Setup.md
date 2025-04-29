@@ -57,6 +57,8 @@ Dashboard Screenshots
   <img src="https://raw.githubusercontent.com/mdl365/Cinder-Ceph/main/Picture6.png" width="600" alt="5."/>
 </a>
 
+[![5.](Dash1.png)](Dash1.png)
+
 
 <a href="Picture6.png" target="_blank">
   <img src="Picture6.png" width="600" alt="5."/>
