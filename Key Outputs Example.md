@@ -5,7 +5,7 @@ Command:
 CEPHADM_IMAGE=quay.io/ceph/ceph:v18.2.2 cephadm bootstrap --mon-ip 192.168.122.120
 
 **Output: Should say "Bootstrap complete", make sure to note admin password for dashboard**
-
+```yaml
 Verifying podman|docker is present...
 Verifying lvm2 is present...
 Verifying time synchronization is in place...
@@ -44,7 +44,7 @@ Ceph Dashboard is now available at:
         Password: xfdnej4utp
 ...
 Bootstrap complete.
-
+```
 
 ### Dashboard Access:
 [See] (Dashboard Setup.md)
