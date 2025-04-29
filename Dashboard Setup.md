@@ -15,11 +15,11 @@ On gHost, go to http://<deviceruningdashboardIP>:8443
     b.) will be prompted to change password after first login
 
 Dashboard Screenshots
-[![](Dash1.png)](Dash-1.png)
-[![](Dash2.png)](Dash-2.png)
-[![](Dash3.png)](Dash-3.png)
-[![](Dash4.png)](Dash-4.png)
-[![](Dash5.png)](Dash-5.png)
+[![1](Dash-1.png)
+[![2](Dash-2.png)
+[![3](Dash-3.png)
+[![4](Dash-4.png)
+[![5](Dash-5.png)
 
 
 
