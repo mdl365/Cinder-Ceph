@@ -1,3 +1,5 @@
+# Dashboard Access
+
 **Since we didn't have a GUI object available to access the Dashboard, I reverse SSH tunneled the traffic to my gHost:**
 
 Run this command on the Ceph-Admin host
