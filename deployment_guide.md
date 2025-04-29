@@ -188,26 +188,17 @@ sudo passwd root
 ```yaml
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@<target OSD IP>
 ```
+20.  **Back to Ceph-Admin,** run the following to add host:
 
-20.  **Back on node to be OSD:** 
-```yaml 
-sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-sudo systemctl restart ssh
-```
-*This is just for security, only allows key-based authentication to root user after initial SSH setup*
+*hostname= Ubuntu-22 hostname*
 
-21.  **Back to Ceph-Admin,** run the following to add host:
-
-hostname= Ubuntu-22 hostname
-
-host IP= Ubuntu-22 management network IP
-    
+*host IP= Ubuntu-22 management network IP*
 ```yaml
 ceph orch host add <hostname> <host IP address>
 ```
-### 22. Repeat as Neccesary for all OSD nodes to be deployed.
+#### 21. Repeat as Neccesary for all OSD nodes to be deployed.
 
-# If need to delete host: 
+#### If you need to delete a host: 
 ```yaml
 ceph orch host drain <hostname>
 ```
@@ -215,7 +206,7 @@ ceph orch host drain <hostname>
 
 With Ubuntu-OSD disk cleared and host added, the node can now be configured as an OSD
 
-23.  To Configure Individually (recommended): 
+22.  To Configure Individually (recommended): 
 ```yaml
 ceph orch daemon add osd <host>:<device-path>
 ```
@@ -223,7 +214,7 @@ ceph orch daemon add osd <host>:<device-path>
 
 Repeat this command for all OSD nodes and storage devices on those nodes
 
-24. You can also tell Ceph to consume all unused devices, this does take longer and eat up compute (recommend individually adding hosts)
+23. You can also tell Ceph to consume all unused devices, this does take longer and eat up compute (recommend individually adding hosts)
 
 ```yaml
 ceph orch apply osd --all-available-devices
@@ -236,15 +227,226 @@ ceph -s
 
 # Task 7: Integrate Cinder and Ceph
 
+https://docs.ceph.com/en/latest/rbd/rbd-openstack/
+
+25. On Ceph-Admin node, create and initialize storage pools
+```yaml
+ceph osd pool create volumes
+ceph osd pool create images
+ceph osd pool create backups
+ceph osd pool create vms
+
+rbd pool init volumes
+rbd pool init images
+rbd pool init backups
+rbd pool init vms
+```
+All Nodes running glance-api, cinder-volume, nova-compute, and cinder-backup act as Ceph clients and require the ceph.conf file for cluster access
+
+For our deployment: controller and compute nodes hold those services
+
+26. On **Controller and Compute** nodes, allow root SSH
+```yaml
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+sudo passwd root
+```
+
+27.  When prompted: set the root password to the standard itsclass's password
+
+28. On **Ceph-Admin** run 
+```yaml
+ssh {root@controller-ip} sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ssh {root@compute-ip} sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+```
+29. On **Controller** run
+```yaml
+sudo apt-get install python-rbd
+sudo apt-get install ceph-common
+```
+30. On **Compute** run
+sudo apt-get install ceph-common
+
+Both Controller and Compute can use Ceph commands now
+
+30.5) Create Ceph users for Glance, Nova, and Cinder, assign them to the data pools
+```yaml
+ceph auth get-or-create client.glance mon 'profile rbd' osd 'profile rbd pool=images' mgr 'profile rbd pool=images'
+ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=volumes, profile rbd pool=vms, profile rbd-read-only pool=images' mgr 'profile rbd pool=volumes, profile rbd pool=vms'
+ceph auth get-or-create client.cinder-backup mon 'profile rbd' osd 'profile rbd pool=backups' mgr 'profile rbd pool=backups'
+```
+
+31. Add the keyrings for services on Controller/Compute and Secret Key for Cinder.Ceph user on Compute
+
+**Run these commands on Ceph-Admin**
+```yaml
+ceph auth get-or-create client.glance | ssh {root@controller-ip} sudo tee /etc/ceph/ceph.client.glance.keyring
+ssh {root@controller-ip} sudo chown glance:glance /etc/ceph/ceph.client.glance.keyring
+ceph auth get-or-create client.cinder | ssh {root@controller-ip} sudo tee /etc/ceph/ceph.client.cinder.keyring
+ssh {root@controller-ip} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
+ceph auth get-or-create client.cinder-backup | ssh {root@controller-ip} sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
+ssh {root@controller-ip} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+
+```yaml
+ceph auth get-or-create client.cinder | ssh {root@compute-ip} sudo tee /etc/ceph/ceph.client.cinder.keyring
+ceph auth get-key client.cinder | ssh {root@compute-ip} tee client.cinder.key
+```
+
+32. On Compute node, generate a UUID and replace the secret key with UUID
+```yaml
+uuidgen
+```
+```yaml
+cat > secret.xml
+```
+Should output this, replace the UUID with UUID from command above
+<<EOF
+<secret ephemeral='no' private='no'>
+  <uuid>457eb676-33da-42ec-9a8c-9293d545c337</uuid>
+  <usage type='ceph'>
+    <name>client.cinder secret</name>
+  </usage>
+</secret>
+EOF
+
+```yaml
+sudo virsh secret-define --file secret.xml
+```
+outputs:
+
+Secret 457eb676-33da-42ec-9a8c-9293d545c337 created (with your UUID there) 
+
+```yaml
+sudo virsh secret-set-value --secret <your-UUID> --base64 $(cat client.cinder.key) && rm client.cinder.key secret.xml
+```
+
+33. Save this UUID for later as well
+
+34. Configure Glance to use Ceph
+
+On Controller:
+```yaml
+sudo nano /etc/glance/glance-api.conf
+```
+Under [glance_store]
+```yaml
+[glance_store]
+stores = rbd
+default_store = rbd
+rbd_store_pool = images
+rbd_store_user = glance
+rbd_store_ceph_conf = /etc/ceph/ceph.conf
+rbd_store_chunk_size = 8
+```
+Under [paste_deploy] make sure that
+```yaml
+[paste_deploy]
+flavor = keystone
+```
+
+35. Configure Cinder to use Ceph
+
+On Controller:
+```yaml
+sudo nano /etc/cinder/cinder.conf
+```
+Under [DEFAULT]
+```yaml
+enabled_backends = ceph
+glance_api_version = 2
+```
+
+At end of file, add
+```yaml
+[ceph]
+volume_driver = cinder.volume.drivers.rbd.RBDDriver
+volume_backend_name = ceph
+rbd_pool = volumes
+rbd_ceph_conf = /etc/ceph/ceph.conf
+rbd_flatten_volume_from_snapshot = false
+rbd_max_clone_depth = 5
+rbd_store_chunk_size = 4
+rados_connect_timeout = -1
+rbd_user = cinder
+rbd_secret_uuid = 457eb676-33da-42ec-9a8c-9293d545c337
+
+36. Configure Nova to use Ceph
+On compute:
+```yaml
+sudo nano /etc/nova/nova.conf
+```
+```yaml
+[libvirt]
+rbd_user = cinder
+rbd_secret_uuid = 457eb676-33da-42ec-9a8c-9293d545c337
+```
+37. Restart OpenStack services
+```yaml
+sudo glance-control api restart
+sudo service nova-compute restart
+sudo service cinder-volume restart
+sudo service cinder-backup restart
+```
+
 # Task 8: Deploy an OpenStack object with Ceph backend storage
 
+38. Get the Id of the Image desired
+```yaml
+openstack image list
+```
+Grab the ID of the image and keep it for next step
+
+38. Run Compute node, create a volume and verify success
+
+*{(name and size) of volume}= whatever name you want and size in GB*
+```yaml
+cinder create --image-id {id of image} --display-name {name of volume} {size of volume}
+```
+```yaml
+openstack volume list
+```
+
+If done correctly, should see your Volume, Size, Status:
+```yaml
+root@controller:/home/itsclass# 
+                         openstack volume list
++-------------------+---------------+-----------+------+-------------------+
+| ID                | Name          | Status    | Size | Attached to       |
++-------------------+---------------+-----------+------+-------------------+
+| fbe00355-47fa-    | Test-3        | available |    1 |                   |
+| 41e4-bff6-        |               |           |      |                   |
+| 40a2b4158feb      |               |           |      |                   |
+... 
+```
+39. To boot machine from command line:
+---------------------------------------
+```yaml
+openstack server create --flavor m1.nano --volume {Volume name or ID} --nic net-id=PROVIDER_NET_ID --key-name mykey provider-instance
+```
+**Example Command**
+```yaml
+openstack server create --flavor m1.nano --volume Test-3 --nic net-id=4d06f1a2-596f-4bdd-b833-ed3aff8357ab --key-name mykey provider-instance
+```
+40. To boot from OpenStack Dashboard
+-------------------------------------
+a. Launch a new instance.
+
+b. Choose the image associated to the copy-on-write clone.
+
+c. Select ‘boot from volume’.
+
+d. Select the volume you created.
 
 
+### Optional Final Step
 
+*Not required but some security enhancement provided by only allowing SSH with keys now that we are done with config*
 
-
-
-
+**Run this on any machine we allowed root SSH:** 
+```yaml 
+sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+```
 
 
 
