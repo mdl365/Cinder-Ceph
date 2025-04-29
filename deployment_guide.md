@@ -38,7 +38,7 @@ https://github.com/OHIO-ECT/ITS-4900-SDx-HW-05
 
 The instructions in this lab build on an already built Openstack environment with a working Controller and Compute node that is able to deploy VMs
 
-# Task .5: Install Cinder on Controller
+# Task 1/2: Install Cinder on Controller
 
 **From root user:**
 ```yaml
@@ -243,7 +243,7 @@ Most Importantly:
    b. Adds SSH key for Ceph cluster to root user's file
 
 
-# Task 3.) Using Ceph Containers
+# Task 3: Using Ceph Containers
 
 There are two ways to run commands with Ceph, inside a container with the Ceph packages or with the Ceph-common repo to run from command line directly
 
@@ -271,7 +271,7 @@ ceph -v
 ```yaml
 ceph status
 ```
-# Task 4.) Preparing Ubuntu-22 to be a Ceph OSD
+# Task 4: Preparing Ubuntu-22 to be a Ceph OSD
 
 Host OSDs must not have partitions, a filesystem, LVM state, and cannot be mounted. There must also be more than 5 GB available on the device. 
 
