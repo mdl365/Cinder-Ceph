@@ -7,9 +7,9 @@
 |Controller |  192.168.122.100 | controller  |	OpenStack services: Keystone, Glance, Nova API, Neutron, Cinder (API, Scheduler), Horizon    
 |Compute    |  192.168.122.101 | compute     |	        Nova Compute, integrated with Ceph-backed storage
 |Ceph-Admin |  192.168.122.120 | ceph-admin  |	Ceph MON, MGR, Dashboard (Admin), also used for bootstrap and management
-|Ceph-OSD1  |  192.168.122.121 | ceph-osd1   |	Ceph OSD daemon (OSD.0)
-|Ceph-OSD2  |  192.168.122.122 | ceph-osd2   |	Ceph OSD daemon (OSD.1)
-|Ceph-OSD3  |  192.168.122.123 | ceph-osd3   |	Ceph OSD daemon (OSD.2)
+|Ceph-OSD1  |  192.168.122.121 | ceph-1      |	Ceph OSD daemon (OSD.0)
+|Ceph-OSD2  |  192.168.122.122 | ceph-2      |	Ceph OSD daemon (OSD.1)
+|Ceph-OSD3  |  192.168.122.123 | ceph-3      |	Ceph OSD daemon (OSD.2)
 
 
 In the diagram you see, there is an extra switch from an attempt to deploy an additional storage network for Ceph. One switch will suffice if only adding Ceph to management network. 
@@ -37,6 +37,115 @@ sudo apt install podman
 https://github.com/OHIO-ECT/ITS-4900-SDx-HW-05
 
 The instructions in this lab build on an already built Openstack environment with a working Controller and Compute node that is able to deploy VMs
+
+# Task .5: Install Cinder on Controller
+
+**From root user:**
+```yaml
+mysql
+```
+```yaml
+CREATE DATABASE cinder;
+```
+```yaml
+GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' \
+  IDENTIFIED BY 'CINDER_DBPASS';
+```
+```yaml
+GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' \
+  IDENTIFIED BY 'CINDER_DBPASS';
+```
+Note: CINDER_DBPASS= you set (use the password from Lab 5 for consistency)
+
+**Then run**
+
+```yaml
+. admin-openrc
+```
+Create a Cinder User
+```yaml
+openstack user create --domain default --password-prompt cinder
+```
+```yaml
+openstack role add --project service --user cinder admin
+```
+```yaml
+openstack service create --name cinderv3 \
+  --description "OpenStack Block Storage" volumev3
+```
+
+**Create Cinder API Endpoints**
+
+Note: Insert your project ID for the following commands
+
+```yaml
+openstack endpoint create --region RegionOne \
+  volumev3 public http://controller:8776/v3/%\(project_id\)s
+
+openstack endpoint create --region RegionOne \
+  volumev3 internal http://controller:8776/v3/%\(project_id\)s
+
+openstack endpoint create --region RegionOne \
+  volumev3 admin http://controller:8776/v3/%\(project_id\)s
+
+exit
+```
+Make sure to exit database after above command
+
+**Install Required Packages**
+sudo apt install cinder-api cinder-scheduler
+
+**Edit Cinder.conf**
+```yaml
+sudo nano /etc/cinder/cinder.conf
+```
+Configure database access as shown, replace CINDER_DBPASS, RABBIT_PASS, and CINDER_PASS with correct password set in the steps above:
+```yaml
+[database]
+connection = mysql+pymysql://cinder:CINDER_DBPASS@controller/cinder
+
+[DEFAULT]
+transport_url = rabbit://openstack:RABBIT_PASS@controller
+auth_strategy = keystone
+my_ip = <controller IP address>
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = cinder
+password = CINDER_PASS
+
+[oslo_concurrency]
+lock_path = /var/lib/cinder/tmp
+````
+**Populate Database**
+```yaml
+su -s /bin/sh -c "cinder-manage db sync" cinder
+```
+**Configure Compute (Nova) for Block Storage**
+```yaml
+sudo nano /etc/nova/nova.conf
+```
+Add:
+```yaml
+[cinder]
+os_region_name = RegionOne
+```
+**Restart Services**
+On Compute:
+```yaml
+service nova-api restart
+```
+On Controller: 
+```yaml
+service cinder-scheduler restart
+service apache2 restart
+```
 
 # **Task 1: Deploy Ceph-Admin Node and Bootstrap**
 
