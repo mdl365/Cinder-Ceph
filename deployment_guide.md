@@ -338,7 +338,7 @@ sudo passwd root
 ```yaml
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@<target OSD IP>
 ```
-20.  **Back to Ceph-Admin,** run the following to add host:
+20.  Run the following to add host:
 
 *hostname= Ubuntu-22 hostname*
 
@@ -374,6 +374,26 @@ ceph orch apply osd --all-available-devices
 ```yaml
 ceph -s
 ```
+
+Example Output:
+```yaml
+root@controller:/home/itsclass# ceph -s
+  cluster:
+    id:     bbb8f4aa-1d41-11f0-be11-236c6b10b766
+    health: HEALTH_OK
+
+  services:
+    mon: 4 daemons, quorum Ceph-Admin,Ceph-3,Ceph-1,Ceph-2 (age 30m)
+    mgr: Ceph-3.rclfqu(active, since 10m), standbys: Ceph-Admin.cvxjxt
+    osd: 3 osds: 3 up (since 29m), 3 in (since 35h)
+
+  data:
+    pools:   6 pools, 161 pgs
+    objects: 14 objects, 449 KiB
+    usage:   958 MiB used, 43 GiB / 44 GiB avail
+    pgs:     161 active+clean
+```
+
 
 # Task 7: Integrate Cinder and Ceph
 
