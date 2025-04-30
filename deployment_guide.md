@@ -306,7 +306,7 @@ sudo nmcli con mod "Wired connection 2" ipv4.method disabled
 sudo nmcli con mod "Wired connection 2" ipv6.method disabled
 sudo ncmli con down "Wired connection 1"
 sudo nmcli con up "Wired connection 1"
-
+```
 
 15.  If you used HDB like me, follow these commands: If not, replace *dev/vdb* with the name of the disk you used
 ```yaml
