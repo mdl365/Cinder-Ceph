@@ -377,7 +377,7 @@ ceph -s
 
 Example Output:
 ```yaml
-root@controller:/home/itsclass# ceph -s
+root@Ceph-Admin:/home/itsclass# ceph -s
   cluster:
     id:     bbb8f4aa-1d41-11f0-be11-236c6b10b766
     health: HEALTH_OK
