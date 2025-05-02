@@ -470,6 +470,7 @@ uuidgen
 cat > secret.xml
 ```
 Should output this, replace the UUID with UUID from command above
+```yaml
 <<EOF
 <secret ephemeral='no' private='no'>
   <uuid>457eb676-33da-42ec-9a8c-9293d545c337</uuid>
@@ -478,6 +479,7 @@ Should output this, replace the UUID with UUID from command above
   </usage>
 </secret>
 EOF
+```
 
 ```yaml
 sudo virsh secret-define --file secret.xml
